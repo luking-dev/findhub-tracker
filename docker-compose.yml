@@ -1,25 +1,25 @@
 services:
   db:
-    image: postgis/postgis:16-3.4
     container_name: postgis
+    image: postgres:16-bookworm
     environment:
-      POSTGRES_USER: tracker
-      POSTGRES_PASSWORD: tracker
       POSTGRES_DB: findhub
+      POSTGRES_PASSWORD: tracker
+      POSTGRES_USER: tracker
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tracker -d findhub"]
+      timeout: 10s
+      interval: 10s
+      retries: 15
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/postgres-init.sql:/docker-entrypoint-initdb.d/01-init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U tracker -d findhub"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   backend:
-    build: ./backend
     container_name: backend
+    build: ./backend
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://tracker:tracker@db:5432/findhub
@@ -32,8 +32,8 @@ services:
       - ./auth:/app/auth:ro
 
   web:
-    build: ./web
     container_name: web
+    build: ./web
     ports:
       - "8180:80"
     depends_on:

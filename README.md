@@ -89,6 +89,13 @@ If you use a virtual environment, activate Python from that environment before r
 
 ### 3. Start the services
 
+If you will run this on a Raspberry Pi (amd64 architecture), install this:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y qemu-user-static binfmt-support
+```
+
 ```bash
 docker compose up -d --build
 ```
